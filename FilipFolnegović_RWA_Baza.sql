@@ -188,8 +188,7 @@ VALUES
 ('Aparat za palačinke Severin', 'Ploča za pečenje palačinki s neljepljivom površinom.', 44.99, 5);
 GO
 
--- 🔹 4. POVEZIVANJE PROIZVODA I DRŽAVA (M:N)
--- Svaki proizvod će biti dostupan u nekoliko država (2–5)
+
 DECLARE @ProizvodID INT = 1;
 DECLARE @DrzavaID INT;
 
