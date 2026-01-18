@@ -17,7 +17,6 @@ public partial class Korisnik
 
     public string LozinkaHash { get; set; } = null!;
 
-    // DODAJ OVO POLJE:
     public string? LozinkaSalt { get; set; }
 
     public string? Uloga { get; set; }

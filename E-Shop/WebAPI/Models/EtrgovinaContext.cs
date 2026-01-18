@@ -33,8 +33,6 @@ public partial class EtrgovinaContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            // "Name=DefaultConnection" govori EF-u: 
-            // "Potraži u appsettings.json pod ConnectionStrings sekcijom naziv 'DefaultConnection'"
             optionsBuilder.UseSqlServer("Name=DefaultConnection");
         }
     }

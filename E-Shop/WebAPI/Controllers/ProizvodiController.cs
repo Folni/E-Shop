@@ -33,7 +33,7 @@ namespace WebAPI.Controllers
                         Opis = p.Opis,
                         Cijena = p.Cijena,
                         SlikaPath = p.SlikaPath,
-                        KategorijaId = p.KategorijaId, // Dodano mapiranje ID-a
+                        KategorijaId = p.KategorijaId, 
                         KategorijaNaziv = p.Kategorija != null ? p.Kategorija.Naziv : "Nema kategorije"
                     })
                     .ToListAsync();
@@ -61,7 +61,7 @@ namespace WebAPI.Controllers
                     Opis = dto.Opis,
                     Cijena = dto.Cijena,
                     SlikaPath = dto.SlikaPath,
-                    KategorijaId = dto.KategorijaId // Koristi ID iz DTO-a
+                    KategorijaId = dto.KategorijaId 
                 };
 
                 _context.Proizvods.Add(proizvod);
@@ -81,7 +81,6 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                // Prikaz detaljnije greške ako postoji (npr. strani ključ ne postoji)
                 var msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return BadRequest($"Greška pri spremanju: {msg}");
             }
@@ -102,7 +101,7 @@ namespace WebAPI.Controllers
             proizvod.Opis = dto.Opis;
             proizvod.Cijena = dto.Cijena;
             proizvod.SlikaPath = dto.SlikaPath;
-            proizvod.KategorijaId = dto.KategorijaId; // Ažuriranje kategorije preko ID-a
+            proizvod.KategorijaId = dto.KategorijaId; 
 
             try
             {
@@ -163,7 +162,7 @@ namespace WebAPI.Controllers
                 Id = p.ProizvodId,
                 Naziv = p.Naziv,
                 Cijena = p.Cijena,
-                KategorijaId = p.KategorijaId, // Mapiranje ID-a
+                KategorijaId = p.KategorijaId, 
                 KategorijaNaziv = p.Kategorija != null ? p.Kategorija.Naziv : "Nema kategorije",
                 SlikaPath = p.SlikaPath
             }).ToListAsync();
@@ -174,7 +173,6 @@ namespace WebAPI.Controllers
         [HttpGet("Paged")]
         public async Task<IActionResult> GetPaged(int page = 1, int count = 10)
         {
-            // Poziv Stored Procedure (Vježba 5.7)
             var proizvodi = await _context.Proizvods
                 .FromSqlInterpolated($"EXEC GetProizvodi @Page={page}, @Count={count}")
                 .ToListAsync();

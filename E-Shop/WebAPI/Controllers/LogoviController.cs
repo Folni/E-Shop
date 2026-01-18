@@ -15,7 +15,6 @@ public class LogoviController : ControllerBase
     }
 
     // GET: api/Logovi?n=10&orderBy=id
-    // Implementacija dohvata posljednjih n zapisa (Vježba 5.9)
     [HttpGet]
     public async Task<IActionResult> Get(int n = 10, string orderBy = "id")
     {
@@ -32,7 +31,6 @@ public class LogoviController : ControllerBase
     }
 
     // POST: api/Logovi
-    // Dodavanje loga uz validaciju (Vježba 5.6, 5.9)
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] LogDto dto)
     {
@@ -54,7 +52,6 @@ public class LogoviController : ControllerBase
     }
 
     // POST: api/Logovi/bulk
-    // Dodavanje više zapisa odjednom (Vježba 5.9)
     [HttpPost("bulk")]
     public async Task<IActionResult> PostBulk([FromBody] LogDto[] dtos)
     {
@@ -76,7 +73,6 @@ public class LogoviController : ControllerBase
     }
 
     // DELETE: api/Logovi/5
-    // Briše prvih n zapisa (Vježba 5.9)
     [HttpDelete("{n}")]
     public async Task<IActionResult> Delete(int n)
     {

@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>eTrgovina - Prijava</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        .login-box {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+        }
+
+        input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+            button:hover {
+                opacity: 0.8;
+            }
+
+        #poruka {
+            margin-top: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Prijava</h2>
+        <input type="text" id="usernameInput" placeholder="Email (Korisničko ime)">
+        <input type="password" id="passwordInput" placeholder="Lozinka">
+        <button onclick="prijaviSe()">Prijavi se</button>
+        <p id="poruka"></p>
+    </div>
+
+    <script>
+        function prijaviSe() {
+            const loginData = {
+                Username: $("#usernameInput").val(),
+                Password: $("#passwordInput").val()
+            };
+
+            $("#poruka").css("color", "blue").text("Pokušaj prijave...");
+
+            $.ajax({
+                url: "/api/Korisnici/Login",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(loginData),
+                success: function (odgovor) {
+                    const stvarniToken = (typeof odgovor === 'object') ? odgovor.token : odgovor;
+
+                    localStorage.setItem("JWT_TOKEN", stvarniToken);
+
+                    $("#poruka").css("color", "green").text("Uspješna prijava! Preusmjeravanje...");
+
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 1000);
+                },
+                error: function (err) {
+                    console.error("Serverski odgovor:", err.responseJSON);
+
+                    let errorMsg = "Neuspješna prijava. Provjerite podatke.";
+
+                    if (err.status === 401) {
+                        errorMsg = "Pogrešan email ili lozinka.";
+                    } else if (err.status === 400) {
+                        errorMsg = "Pogrešan format zahtjeva.";
+                    }
+
+                    $("#poruka").css("color", "red").text(errorMsg);
+                    localStorage.removeItem("JWT_TOKEN");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+﻿@model List<WebAPI.Models.Proizvod>
+
+@{
+    ViewData["Title"] = "Vaša košarica";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4"><i class="bi bi-cart-check"></i> Vaša košarica</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Proizvod</th>
+                            <th class="text-end">Cijena</th>
+                            <th class="text-center">Akcija</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.Naziv</strong><br />
+                                    <small class="text-muted">@item.Kategorija?.Naziv</small>
+                                </td>
+                                <td class="text-end">@item.Cijena.ToString("N2") €</td>
+                                <td class="text-center">
+                                    @* Forma za uklanjanje stavke *@
+                                    <form asp-controller="Kosarica" asp-action="Ukloni" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="proizvodId" value="@item.ProizvodId" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-trash"></i> Ukloni
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td class="fw-bold">Ukupno za platiti:</td>
+                            <td class="text-end fw-bold text-primary">
+                                @Model.Sum(p => p.Cijena).ToString("N2") €
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Nastavi kupovinu
+                    </a>
+
+                    @* Glavna forma za potvrdu narudžbe *@
+                    <form asp-controller="Kosarica" asp-action="PotvrdiNarudzbu" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success btn-lg shadow">
+                            Potvrdi i plati <i class="bi bi-credit-card"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x display-1 text-muted"></i>
+            <p class="mt-3 fs-4 text-muted">Vaša košarica je prazna.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3 px-4">
+                Kreni u kupovinu
+            </a>
+        </div>
+    }
+</div>

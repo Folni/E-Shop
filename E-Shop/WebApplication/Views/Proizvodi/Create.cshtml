@@ -1,0 +1,66 @@
+﻿@model WebApplication.ViewModels.ProizvodVM
+
+@{
+    ViewData["Title"] = "Dodaj novi proizvod";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        @* Povećao sam kolonu na 6 radi bolje preglednosti multi-selecta *@
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Naziv" class="control-label"></label>
+                <input asp-for="Naziv" class="form-control" />
+                <span asp-validation-for="Naziv" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Cijena" class="control-label"></label>
+                <input asp-for="Cijena" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Cijena" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Opis" class="control-label"></label>
+                <textarea asp-for="Opis" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Opis" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="KategorijaId" class="control-label"></label>
+                <select asp-for="KategorijaId" asp-items="ViewBag.KategorijaSelect" class="form-select">
+                    <option value="">-- Odaberite kategoriju --</option>
+                </select>
+                <span asp-validation-for="KategorijaId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="OdabraneDrzaveIds" class="control-label">Dostupno u državama</label>
+                <select asp-for="OdabraneDrzaveIds"
+                        asp-items="ViewBag.DrzaveLista"
+                        class="form-select"
+                        multiple="multiple"
+                        style="height: 150px;">
+                </select>
+                <span asp-validation-for="OdabraneDrzaveIds" class="text-danger"></span>
+                <div class="form-text">Držite <strong>Ctrl</strong> (ili Cmd na Macu) za odabir više država.</div>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-success">Spremi</button>
+                <a asp-action="Index" class="btn btn-secondary">Odustani</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

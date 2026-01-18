@@ -1,0 +1,77 @@
+﻿@model IEnumerable<WebAPI.Models.Proizvod>
+
+@{
+    ViewData["Title"] = "Početna - Trgovina";
+}
+
+<h1 class="my-4 text-center">Naša Ponuda</h1>
+
+<div class="row justify-content-center mb-5">
+    <div class="col-md-8">
+        <div class="d-flex gap-2">
+            <form asp-action="Index" method="get" class="flex-grow-1">
+                <div class="input-group shadow-sm">
+                    <input type="text" name="searchString" class="form-control" placeholder="Pretraži proizvode (naziv ili opis)..." />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Traži
+                    </button>
+                </div>
+            </form>
+
+            <a asp-controller="Kosarica" asp-action="Index" class="btn btn-warning shadow-sm d-flex align-items-center">
+                <i class="bi bi-cart-fill me-2"></i>
+                <span>Pregledaj košaricu</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center">
+            <p class="text-muted">Trenutno nema proizvoda koji odgovaraju vašoj pretrazi.</p>
+        </div>
+    }
+
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title text-truncate" style="max-width: 70%;">@item.Naziv</h5>
+                        <span class="badge bg-secondary">@item.Kategorija?.Naziv</span>
+                    </div>
+
+                    <p class="card-text text-muted small" style="height: 50px; overflow: hidden;">@item.Opis</p>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">Dostupno u:</small>
+                        @if (item.Drzavas != null && item.Drzavas.Any())
+                        {
+                            @foreach (var d in item.Drzavas)
+                            {
+                                <span class="badge bg-info text-dark me-1" style="font-size: 0.75rem;">@d.Naziv</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted small italic">Nije definirana dostupnost</span>
+                        }
+                    </div>
+
+                    <h4 class="text-primary mt-auto">@item.Cijena.ToString("N2") €</h4>
+                </div>
+                <div class="card-footer bg-white border-top-0 pb-3">
+                    <form asp-controller="Kosarica" asp-action="Dodaj" method="post">
+                        <input type="hidden" name="proizvodId" value="@item.ProizvodId" />
+                        <button type="submit" class="btn btn-outline-success w-100">
+                            <i class="bi bi-cart-plus"></i> Dodaj u košaricu
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

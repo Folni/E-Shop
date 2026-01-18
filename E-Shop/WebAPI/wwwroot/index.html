@@ -1,0 +1,220 @@
+﻿<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>eTrgovina - Admin Panel</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        nav {
+            padding: 10px;
+            background: #eee;
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .forma-group {
+            margin-bottom: 10px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            width: 400px;
+        }
+
+        input, textarea {
+            width: 100%;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: black;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav id="navigacija"></nav>
+
+    <h1>Upravljanje proizvodima</h1>
+
+    <div id="proizvodi-kontejner"></div>
+
+    <hr>
+    <div class="forma-group">
+        <h3 id="forma-naslov">Dodaj novi proizvod</h3>
+        <input type="hidden" id="proizvod-id">
+
+        <input type="text" id="naziv" placeholder="Naziv proizvoda">
+        <textarea id="opis" placeholder="Opis proizvoda"></textarea>
+        <input type="number" id="cijena" placeholder="Cijena (EUR)">
+        <input type="text" id="slikaPath" placeholder="Putanja slike (URL)">
+        <input type="number" id="kategorijaId" placeholder="ID Kategorije (npr. 1)">
+
+        <button id="btn-spremi" onclick="spremiProizvod()">Dodaj proizvod</button>
+        <button id="btn-odustani" onclick="resetirajFormu()" style="display:none;">Odustani</button>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            provjeriPrijavu();
+            ucitajProizvode();
+        });
+
+        function provjeriPrijavu() {
+            const token = localStorage.getItem("JWT_TOKEN");
+            if (token) {
+                $("#navigacija").html('<button onclick="odjaviSe()">Odjavi se</button>');
+            } else {
+                $("#navigacija").html('<a href="login.html">Prijavi se</a>');
+                $(".forma-group").hide(); 
+            }
+        }
+
+        function odjaviSe() {
+            localStorage.removeItem("JWT_TOKEN");
+            window.location.reload();
+        }
+
+        function ucitajProizvode() {
+            $.get("/api/Proizvodi", function (data) {
+                let html = `<table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Naziv</th>
+                                <th>Opis</th>
+                                <th>Cijena</th>
+                                <th>Kategorija</th>
+                                <th>Akcije</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                data.forEach(p => {
+                    html += `<tr>
+                            <td>${p.id}</td>
+                            <td><strong>${p.naziv}</strong></td>
+                            <td>${p.opis || '-'}</td>
+                            <td>${p.cijena} EUR</td>
+                            <td>${p.kategorijaNaziv} (ID: ${p.kategorijaId})</td>
+                            <td>
+                                <button class="btn-edit" onclick="pripremiUredivanje(${JSON.stringify(p).replace(/"/g, '&quot;')})">Uredi</button>
+                                <button class="btn-delete" onclick="obrisiProizvod(${p.id})">Obriši</button>
+                            </td>
+                        </tr>`;
+                });
+
+                html += "</tbody></table>";
+                $("#proizvodi-kontejner").html(html);
+            });
+        }
+
+        function pripremiUredivanje(p) {
+            $("#forma-naslov").text("Uredi proizvod: " + p.naziv);
+            $("#proizvod-id").val(p.id);
+            $("#naziv").val(p.naziv);
+            $("#opis").val(p.opis);
+            $("#cijena").val(p.cijena);
+            $("#slikaPath").val(p.slikaPath);
+            $("#kategorijaId").val(p.kategorijaId);
+
+            $("#btn-spremi").text("Spremi promjene");
+            $("#btn-odustani").show();
+        }
+
+        function resetirajFormu() {
+            $("#forma-naslov").text("Dodaj novi proizvod");
+            $("#proizvod-id").val("");
+            $("#naziv").val("");
+            $("#opis").val("");
+            $("#cijena").val("");
+            $("#slikaPath").val("");
+            $("#kategorijaId").val("");
+
+            $("#btn-spremi").text("Dodaj proizvod");
+            $("#btn-odustani").hide();
+        }
+
+        function spremiProizvod() {
+            const id = $("#proizvod-id").val();
+            const token = localStorage.getItem("JWT_TOKEN");
+
+            const proizvodData = {
+                Id: id ? parseInt(id) : 0,
+                Naziv: $("#naziv").val(),
+                Opis: $("#opis").val(),
+                Cijena: parseFloat($("#cijena").val()),
+                SlikaPath: $("#slikaPath").val(),
+                KategorijaId: parseInt($("#kategorijaId").val())
+            };
+
+            const metoda = id ? "PUT" : "POST";
+            const url = id ? "/api/Proizvodi/" + id : "/api/Proizvodi";
+
+            $.ajax({
+                url: url,
+                method: metoda,
+                contentType: "application/json",
+                headers: { "Authorization": "Bearer " + token },
+                data: JSON.stringify(proizvodData),
+                success: function () {
+                    alert(id ? "Proizvod ažuriran!" : "Proizvod dodan!");
+                    resetirajFormu();
+                    ucitajProizvode();
+                },
+                error: function (err) {
+                    alert("Greška: " + err.responseText);
+                }
+            });
+        }
+
+        function obrisiProizvod(id) {
+            if (!confirm("Sigurno obrisati?")) return;
+            const token = localStorage.getItem("JWT_TOKEN");
+
+            $.ajax({
+                url: "/api/Proizvodi/" + id,
+                method: "DELETE",
+                headers: { "Authorization": "Bearer " + token },
+                success: function () {
+                    ucitajProizvode();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+﻿@model IEnumerable<WebAPI.Models.Narudzba>
+
+@{
+    ViewData["Title"] = "Pregled svih narudžbi";
+}
+
+<h1 class="my-4">@ViewData["Title"]</h1>
+
+<div class="table-responsive">
+    <table class="table table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Kupac</th>
+                <th>Datum</th>
+                <th>Proizvodi</th>
+                <th>Ukupna cijena</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var narudzba in Model)
+            {
+                <tr>
+                    <td>#@narudzba.NarudzbaId</td>
+                    <td>
+                        <strong>@narudzba.Korisnik?.Ime @narudzba.Korisnik?.Prezime</strong><br />
+                        <small class="text-muted">@narudzba.Korisnik?.Email</small>
+                    </td>
+                    <td>@narudzba.DatumKreiranja?.ToString("dd.MM.yyyy. HH:mm")</td>
+                    <td>
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var stavka in narudzba.NarudzbaProizvods)
+                            {
+                                <li>
+                                    <i class="bi bi-dot"></i> @stavka.Proizvod?.Naziv
+                                    <span class="badge bg-secondary">x @stavka.Kolicina</span>
+                                </li>
+                            }
+                        </ul>
+                    </td>
+                    <td class="fw-bold text-primary">
+                        @narudzba.UkupnaCijena?.ToString("N2") €
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Trenutno nema evidentiranih narudžbi.</div>
+}

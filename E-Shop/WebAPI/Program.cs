@@ -8,7 +8,6 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. JWT KONFIGURACIJA
 var secureKey = builder.Configuration["JWT:SecureKey"];
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
@@ -28,7 +27,6 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-// 2. SWAGGER S GUMBOM ZA LOGIN (LOKOT)
 builder.Services.AddSwaggerGen(c => {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -59,7 +57,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// 3. REDOSLIJED JE BITAN: Prvo Authentication, pa Authorization
+app.UseDefaultFiles(); 
+app.UseStaticFiles(); 
+
 app.UseAuthentication();
 app.UseAuthorization();
 

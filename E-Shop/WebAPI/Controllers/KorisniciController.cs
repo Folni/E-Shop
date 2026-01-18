@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
-using WebAPI.Security; // Putanja do tvojih Security klasa
+using WebAPI.Security; 
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
@@ -26,21 +26,17 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // 1. Pronađi korisnika po emailu (Vježba 6.4)
             var korisnik = await _context.Korisniks
                 .FirstOrDefaultAsync(k => k.Email == login.Username);
 
             if (korisnik == null)
                 return Unauthorized("Neispravan email ili lozinka.");
 
-            // 2. Provjera lozinke pomoću Salt-a iz baze (Vježba 6.4)
-            // Ako je lozinka u bazi običan tekst, ovo neće raditi - moraš se ponovno registrirati
             var hashZaProvjeru = PasswordHashProvider.GetHash(login.Password, korisnik.LozinkaSalt!);
 
             if (korisnik.LozinkaHash != hashZaProvjeru)
                 return Unauthorized("Neispravan email ili lozinka.");
 
-            // 3. Generiranje JWT tokena (Vježba 6.2)
             var secureKey = _configuration["JWT:SecureKey"];
             var token = JwtTokenProvider.CreateToken(secureKey!, 120, korisnik.Email, korisnik.Uloga ?? "Korisnik");
 
@@ -63,7 +59,6 @@ namespace WebAPI.Controllers
                 return BadRequest("Korisnik s tim emailom već postoji.");
             }
 
-            // 1. Generiranje Salta i Hasha lozinke (Vježba 6.3)
             var salt = PasswordHashProvider.GetSalt();
             var hash = PasswordHashProvider.GetHash(model.Password, salt);
 
@@ -72,8 +67,8 @@ namespace WebAPI.Controllers
                 Ime = model.Ime,
                 Prezime = model.Prezime,
                 Email = model.Email,
-                LozinkaHash = hash,   // Spremamo Hash
-                LozinkaSalt = salt,   // Spremamo Salt
+                LozinkaHash = hash,   
+                LozinkaSalt = salt,   
                 Uloga = "Korisnik",
                 Guid = Guid.NewGuid()
             };
@@ -82,7 +77,6 @@ namespace WebAPI.Controllers
             {
                 _context.Korisniks.Add(noviKorisnik);
 
-                // Logiranje (Vježba 5.9)
                 _context.Logovis.Add(new Logovi
                 {
                     Tip = "INFO",
@@ -99,7 +93,6 @@ namespace WebAPI.Controllers
             }
         }
 
-        // Testna metoda da provjeriš radi li [Authorize] (Vježba 6.5)
         [Authorize]
         [HttpGet("profil")]
         public IActionResult GetProfile()

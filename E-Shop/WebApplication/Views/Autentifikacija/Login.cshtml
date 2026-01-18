@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Prijava";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4 card p-4 shadow">
+        <h2 class="text-center">Admin Prijava</h2>
+        <hr />
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+        <form asp-action="Login" method="post">
+            <div class="form-group mb-3">
+                <label>Email</label>
+                <input name="email" type="email" class="form-control" required />
+            </div>
+            <div class="form-group mb-3">
+                <label>Lozinka</label>
+                <input name="lozinka" type="password" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Prijavi se</button>
+            <hr />
+            <div class="text-center mt-3">
+                <p>Nemate račun?</p>
+                <a asp-action="Register" class="btn btn-outline-primary w-100">Registrirajte se</a>
+            </div>
+        </form>
+    </div>
+</div>

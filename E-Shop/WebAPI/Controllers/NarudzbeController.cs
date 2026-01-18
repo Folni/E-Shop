@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Authorization; // Potrebno za [Authorize]
+using Microsoft.AspNetCore.Authorization; 
 
 namespace WebAPI.Controllers
 {
-    [Authorize] // Vježba 6.7 - Samo prijavljeni korisnici s JWT tokenom mogu pristupiti
+    [Authorize] 
     [Route("api/[controller]")]
     [ApiController]
     public class NarudzbeController : ControllerBase
@@ -27,7 +27,6 @@ namespace WebAPI.Controllers
 
             try
             {
-                // 1. Kreiramo glavni zapis narudžbe
                 var novaNarudzba = new Narudzba
                 {
                     KorisnikId = model.KorisnikId,
@@ -38,7 +37,6 @@ namespace WebAPI.Controllers
                 _context.Narudzbas.Add(novaNarudzba);
                 await _context.SaveChangesAsync();
 
-                // 2. Kreiramo stavke (veza n-to-n)
                 foreach (var stavka in model.Stavke)
                 {
                     var detalji = new NarudzbaProizvod
