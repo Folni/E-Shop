@@ -23,7 +23,9 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Početna</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door"></i> Početna
+                            </a>
                         </li>
 
                         @if (User.Identity.IsAuthenticated)
@@ -37,17 +39,34 @@
                                     <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Narudzbe" asp-action="AdminPregled">📋 Narudžbe</a>
                                 </li>
                             }
+                        }
+                    </ul>
 
-                            <li class="nav-item ms-auto">
+                    @* Desna strana navigacije *@
+                    <ul class="navbar-nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @* NOVO: Link na Profilnu stranicu (AJAX Ishod 5) *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Autentifikacija" asp-action="Profil">
+                                    <i class="bi bi-person-circle"></i> Moj Profil (@User.Identity.Name)
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-danger" asp-area="" asp-controller="Autentifikacija" asp-action="Logout">
-                                    Odjava (@User.Identity.Name)
+                                    <i class="bi bi-box-arrow-right"></i> Odjava
                                 </a>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item ms-auto">
-                                <a class="nav-link text-primary fw-bold" asp-area="" asp-controller="Autentifikacija" asp-action="Login">Prijava</a>
+                            <li class="nav-item">
+                                <a class="nav-link text-primary fw-bold" asp-area="" asp-controller="Autentifikacija" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right"></i> Prijava
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-secondary" asp-area="" asp-controller="Autentifikacija" asp-action="Register">Registracija</a>
                             </li>
                         }
                     </ul>
@@ -61,9 +80,9 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - E-Trgovina - Sustav za upravljanje narudžbama
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container text-center py-3">
+            &copy; 2026 - <strong>E-Trgovina</strong> - Sustav za upravljanje narudžbama
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

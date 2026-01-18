@@ -1,0 +1,84 @@
+﻿@model WebAPI.Models.Korisnik
+
+@{
+    ViewData["Title"] = "Moj Profil";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-person-circle"></i> Osobni podaci</h4>
+                </div>
+                <div class="card-body">
+                    <div id="statusPoruka" class="alert d-none"></div>
+
+                    <form id="profilForm">
+                        <div class="mb-3">
+                            <label class="form-label">Ime</label>
+                            <input type="text" id="inputIme" class="form-control" value="@Model.Ime" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Prezime</label>
+                            <input type="text" id="inputPrezime" class="form-control" value="@Model.Prezime" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email adresa</label>
+                            <input type="email" id="inputEmail" class="form-control" value="@Model.Email" required>
+                        </div>
+
+                        <button type="button" id="btnSpremi" class="btn btn-success w-100">
+                            <span id="loader" class="spinner-border spinner-border-sm d-none"></span>
+                            Spremi promjene (AJAX)
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('btnSpremi').addEventListener('click', function() {
+            // Priprema podataka
+            const podaci = new URLSearchParams();
+            podaci.append('ime', document.getElementById('inputIme').value);
+            podaci.append('prezime', document.getElementById('inputPrezime').value);
+            podaci.append('email', document.getElementById('inputEmail').value);
+
+            // UI Efekti
+            const btn = this;
+            const loader = document.getElementById('loader');
+            const porukaDiv = document.getElementById('statusPoruka');
+
+            btn.disabled = true;
+            loader.classList.remove('d-none');
+
+            // AJAX Poziv (Fetch API)
+            fetch('/Autentifikacija/AzurirajProfil', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: podaci
+            })
+            .then(response => response.json())
+            .then(data => {
+                porukaDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+                porukaDiv.classList.add(data.success ? 'alert-success' : 'alert-danger');
+                porukaDiv.innerText = data.message;
+
+                btn.disabled = false;
+                loader.classList.add('d-none');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                btn.disabled = false;
+                loader.classList.add('d-none');
+            });
+        });
+    </script>
+}

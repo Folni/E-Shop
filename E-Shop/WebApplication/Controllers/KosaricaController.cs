@@ -4,23 +4,30 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using WebAPI.Models;
-using System.Security.Claims; 
+using System.Security.Claims;
+using AutoMapper; // Potrebno za AutoMapper
+using WebApplication.DTOs; // Potrebno za ProizvodDTO
 
 namespace WebApplication.Controllers
 {
     public class KosaricaController : Controller
     {
         private readonly EtrgovinaContext _context;
+        private readonly IMapper _mapper; 
 
-        public KosaricaController(EtrgovinaContext context)
+        public KosaricaController(EtrgovinaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public IActionResult Index()
         {
-            var kosarica = PreuzmiIzSesije();
-            return View(kosarica);
+            var kosaricaEntiteti = PreuzmiIzSesije();
+
+            var kosaricaDto = _mapper.Map<List<ProizvodDTO>>(kosaricaEntiteti);
+
+            return View(kosaricaDto);
         }
 
         [HttpPost]
@@ -92,14 +99,18 @@ namespace WebApplication.Controllers
                 _context.Narudzbas.Add(novaNarudzba);
                 await _context.SaveChangesAsync();
 
-                foreach (var p in kosarica)
-                {
-                    _context.NarudzbaProizvods.Add(new NarudzbaProizvod
+                var stavkeZaBazu = kosarica
+                    .GroupBy(p => p.ProizvodId)
+                    .Select(g => new NarudzbaProizvod
                     {
                         NarudzbaId = novaNarudzba.NarudzbaId,
-                        ProizvodId = p.ProizvodId,
-                        Kolicina = 1
+                        ProizvodId = g.Key,
+                        Kolicina = g.Count() 
                     });
+
+                foreach (var stavka in stavkeZaBazu)
+                {
+                    _context.NarudzbaProizvods.Add(stavka);
                 }
 
                 await _context.SaveChangesAsync();

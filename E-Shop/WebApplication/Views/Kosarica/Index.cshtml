@@ -1,4 +1,4 @@
-﻿@model List<WebAPI.Models.Proizvod>
+﻿@model List<WebApplication.DTOs.ProizvodDTO>
 
 @{
     ViewData["Title"] = "Vaša košarica";
@@ -25,11 +25,11 @@
                             <tr>
                                 <td>
                                     <strong>@item.Naziv</strong><br />
-                                    <small class="text-muted">@item.Kategorija?.Naziv</small>
+                                    @* AutoMapper je već izvukao naziv kategorije u ovo polje *@
+                                    <small class="text-muted">@item.KategorijaNaziv</small>
                                 </td>
                                 <td class="text-end">@item.Cijena.ToString("N2") €</td>
                                 <td class="text-center">
-                                    @* Forma za uklanjanje stavke *@
                                     <form asp-controller="Kosarica" asp-action="Ukloni" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="proizvodId" value="@item.ProizvodId" />
@@ -57,7 +57,6 @@
                         <i class="bi bi-arrow-left"></i> Nastavi kupovinu
                     </a>
 
-                    @* Glavna forma za potvrdu narudžbe *@
                     <form asp-controller="Kosarica" asp-action="PotvrdiNarudzbu" method="post">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-success btn-lg shadow">

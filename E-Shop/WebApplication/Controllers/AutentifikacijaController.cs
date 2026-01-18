@@ -5,6 +5,7 @@ using System.Security.Claims;
 using WebAPI.Models;
 using WebAPI.Security;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization; // Potrebno za [Authorize]
 
 namespace WebApplication.Controllers
 {
@@ -26,22 +27,22 @@ namespace WebApplication.Controllers
                 .FirstOrDefaultAsync(k => k.Email == email);
 
             if (korisnik != null)
-            {   
+            {
                 var hashZaProvjeru = WebAPI.Security.PasswordHashProvider.GetHash(lozinka, korisnik.LozinkaSalt!);
 
                 if (korisnik.LozinkaHash == hashZaProvjeru)
                 {
                     var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, korisnik.Email),
-                    new Claim("StvarnoIme", korisnik.Ime), 
-                    new Claim(ClaimTypes.Email, korisnik.Email),
-                    new Claim(ClaimTypes.Role, korisnik.Uloga ?? "Korisnik")
-                };
+                    {
+                        new Claim(ClaimTypes.Name, korisnik.Email),
+                        new Claim("StvarnoIme", korisnik.Ime),
+                        new Claim(ClaimTypes.Email, korisnik.Email),
+                        new Claim(ClaimTypes.Role, korisnik.Uloga ?? "Korisnik")
+                    };
 
-                    var claimsIdentity = new ClaimsIdentity(claims, Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                    await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme,
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity));
 
                     if (korisnik.Uloga == "Admin")
@@ -86,7 +87,7 @@ namespace WebApplication.Controllers
                 Email = email,
                 LozinkaHash = hash,
                 LozinkaSalt = salt,
-                Uloga = "Korisnik", 
+                Uloga = "Korisnik",
                 Guid = Guid.NewGuid()
             };
 
@@ -95,6 +96,48 @@ namespace WebApplication.Controllers
 
             TempData["SuccessMessage"] = "Registracija uspješna! Sada se možete prijaviti.";
             return RedirectToAction("Login");
+        }
+
+
+        [Authorize]
+        public async Task<IActionResult> Profil()
+        {
+            var emailKorisnika = User.Identity?.Name;
+            var korisnik = await _context.Korisniks
+                .FirstOrDefaultAsync(k => k.Email == emailKorisnika);
+
+            if (korisnik == null) return NotFound();
+
+            return View(korisnik);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AzurirajProfil(string ime, string prezime, string email)
+        {
+            var trenutniEmail = User.Identity?.Name;
+            var korisnik = await _context.Korisniks
+                .FirstOrDefaultAsync(k => k.Email == trenutniEmail);
+
+            if (korisnik == null)
+            {
+                return Json(new { success = false, message = "Korisnik nije pronađen." });
+            }
+
+            korisnik.Ime = ime;
+            korisnik.Prezime = prezime;
+            korisnik.Email = email;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Podaci su uspješno spremljeni putem AJAX-a!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Greška pri spremanju: " + ex.Message });
+            }
         }
     }
 }
