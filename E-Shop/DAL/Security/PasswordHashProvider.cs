@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-namespace WebAPI.Security
+namespace ETrgovina.DAL.Security
 {
     public class PasswordHashProvider
     {

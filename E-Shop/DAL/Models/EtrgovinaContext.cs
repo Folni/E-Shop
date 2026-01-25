@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace WebAPI.Models;
+namespace ETrgovina.DAL.Models;
 
 public partial class EtrgovinaContext : DbContext
 {

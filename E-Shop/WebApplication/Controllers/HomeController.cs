@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebAPI.Models;
+using ETrgovina.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using WebApplication.DTOs;

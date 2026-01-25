@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering; 
 using Microsoft.EntityFrameworkCore;
-using WebAPI.Models;
+using ETrgovina.DAL.Models;
 using WebApplication.ViewModels;
 
 namespace WebApplication.Controllers 

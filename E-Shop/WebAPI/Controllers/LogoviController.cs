@@ -1,99 +1,99 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WebAPI.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions; // Potrebno za ProjectTo
+using ETrgovina.DAL.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.DTO;
 
-[Route("api/[controller]")]
-[ApiController]
-public class LogoviController : ControllerBase
+namespace WebAPI.Controllers
 {
-    private readonly EtrgovinaContext _context;
-
-    public LogoviController(EtrgovinaContext context)
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class LogoviController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly EtrgovinaContext _context;
+        private readonly IMapper _mapper;
 
-    // GET: api/Logovi?n=10&orderBy=id
-    [HttpGet]
-    public async Task<IActionResult> Get(int n = 10, string orderBy = "id")
-    {
-        var query = _context.Logovis.AsQueryable();
-
-        query = orderBy.ToLower() switch
+        public LogoviController(EtrgovinaContext context, IMapper mapper)
         {
-            "datum" => query.OrderByDescending(l => l.Datum),
-            "poruka" => query.OrderBy(l => l.Poruka),
-            _ => query.OrderByDescending(l => l.LogId)
-        };
-
-        return Ok(await query.Take(n).ToListAsync());
-    }
-
-    // POST: api/Logovi
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] LogDto dto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
+            _context = context;
+            _mapper = mapper;
         }
 
-        var noviLog = new Logovi
+        // GET: api/Logovi?n=10&orderBy=id
+        [HttpGet]
+        public async Task<IActionResult> Get(int n = 10, string orderBy = "id")
         {
-            Tip = dto.Tip,
-            Poruka = dto.Poruka,
-            Datum = DateTime.Now
-        };
+            var query = _context.Logovis.AsQueryable();
 
-        _context.Logovis.Add(noviLog);
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
+            query = orderBy.ToLower() switch
+            {
+                "datum" => query.OrderByDescending(l => l.Datum),
+                "poruka" => query.OrderBy(l => l.Poruka),
+                _ => query.OrderByDescending(l => l.LogId)
+            };
 
-    // POST: api/Logovi/bulk
-    [HttpPost("bulk")]
-    public async Task<IActionResult> PostBulk([FromBody] LogDto[] dtos)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
+            // Koristimo ProjectTo - ovo automatski generira SELECT u SQL-u samo za polja u DTO-u
+            var result = await query
+                .Take(n)
+                .ProjectTo<LogDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return Ok(result);
         }
 
-        var noviLogovi = dtos.Select(dto => new Logovi
+        // POST: api/Logovi
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] LogDTO dto)
         {
-            Tip = dto.Tip,
-            Poruka = dto.Poruka,
-            Datum = DateTime.Now
-        });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        _context.Logovis.AddRange(noviLogovi);
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
+            // Mapiramo DTO u Model
+            var log = _mapper.Map<Logovi>(dto);
 
-    // DELETE: api/Logovi/5
-    [HttpDelete("{n}")]
-    public async Task<IActionResult> Delete(int n)
-    {
-        var zaBrisanje = await _context.Logovis
-            .OrderBy(l => l.LogId)
-            .Take(n)
-            .ToListAsync();
+            // Osiguravamo da je datum trenutan ako nije poslan
+            log.Datum ??= DateTime.Now;
 
-        _context.Logovis.RemoveRange(zaBrisanje);
-        await _context.SaveChangesAsync();
-        return Ok($"Obrisano je prvih {zaBrisanje.Count} zapisa.");
-    }
+            _context.Logovis.Add(log);
+            await _context.SaveChangesAsync();
 
-    public class LogDto
-    {
-        [Required(ErrorMessage = "Tip loga je obavezan")] //
-        [StringLength(50)]
-        public string Tip { get; set; } = null!;
+            return Ok();
+        }
 
-        [Required(ErrorMessage = "Poruka je obavezna")] //
-        [StringLength(1024, ErrorMessage = "Poruka ne smije biti duža od 1024 znaka")] //
-        public string Poruka { get; set; } = null!;
+        // POST: api/Logovi/bulk
+        [HttpPost("bulk")]
+        public async Task<IActionResult> PostBulk([FromBody] List<LogDTO> dtos)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // Mapiramo cijelu listu odjednom
+            var logovi = _mapper.Map<List<Logovi>>(dtos);
+
+            foreach (var l in logovi) l.Datum ??= DateTime.Now;
+
+            _context.Logovis.AddRange(logovi);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        // DELETE: api/Logovi/5
+        [HttpDelete("{n}")]
+        public async Task<IActionResult> Delete(int n)
+        {
+            var zaBrisanje = await _context.Logovis
+                .OrderBy(l => l.LogId)
+                .Take(n)
+                .ToListAsync();
+
+            _context.Logovis.RemoveRange(zaBrisanje);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Obrisano je {zaBrisanje.Count} zapisa.");
+        }
     }
 }

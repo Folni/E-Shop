@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WebAPI.Models;
+using ETrgovina.DAL.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);

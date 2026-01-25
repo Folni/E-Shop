@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace WebAPI.Security
+namespace ETrgovina.DAL.Security
 {
     public class JwtTokenProvider
     {

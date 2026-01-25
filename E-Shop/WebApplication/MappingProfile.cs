@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using WebAPI.Models; 
+using ETrgovina.DAL.Models; 
 using WebApplication.DTOs;
 
 public class MappingProfile : Profile

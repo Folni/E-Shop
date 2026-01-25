@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WebAPI.Models;
+namespace ETrgovina.DAL.Models;
 
 public partial class NarudzbaProizvod
 {

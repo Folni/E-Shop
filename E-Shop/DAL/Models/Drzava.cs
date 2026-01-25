@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WebAPI.Models;
+namespace ETrgovina.DAL.Models;
 
-public partial class Kategorija
+public partial class Drzava
 {
-    public int KategorijaId { get; set; }
+    public int DrzavaId { get; set; }
 
     public string Naziv { get; set; } = null!;
 

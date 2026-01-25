@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
-using WebAPI.Models;
-using WebAPI.Security;
+using ETrgovina.DAL.Models;
+using ETrgovina.DAL.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization; // Potrebno za [Authorize]
 
@@ -28,7 +28,7 @@ namespace WebApplication.Controllers
 
             if (korisnik != null)
             {
-                var hashZaProvjeru = WebAPI.Security.PasswordHashProvider.GetHash(lozinka, korisnik.LozinkaSalt!);
+                var hashZaProvjeru = ETrgovina.DAL.Security.PasswordHashProvider.GetHash(lozinka, korisnik.LozinkaSalt!);
 
                 if (korisnik.LozinkaHash == hashZaProvjeru)
                 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Models;
+using ETrgovina.DAL.Models;
 using Microsoft.EntityFrameworkCore; 
 using System.Linq; 
 

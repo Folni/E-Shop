@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using WebAPI.Models;
+using ETrgovina.DAL.Models;
 using System.Security.Claims;
 using AutoMapper; // Potrebno za AutoMapper
 using WebApplication.DTOs; // Potrebno za ProizvodDTO

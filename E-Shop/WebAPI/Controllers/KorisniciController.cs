@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebAPI.Models;
-using WebAPI.Security; 
-using System.ComponentModel.DataAnnotations;
+﻿using AutoMapper;
+using ETrgovina.DAL.Models;
+using ETrgovina.DAL.Security;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using WebAPI.DTO;
+
 
 namespace WebAPI.Controllers
 {
@@ -14,17 +16,20 @@ namespace WebAPI.Controllers
     {
         private readonly EtrgovinaContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper; // 1. Dodajemo mapper
 
-        public KorisniciController(EtrgovinaContext context, IConfiguration configuration)
+        public KorisniciController(EtrgovinaContext context, IConfiguration configuration, IMapper mapper)
         {
             _context = context;
             _configuration = configuration;
+            _mapper = mapper; // 2. Ubrizgavamo mapper
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel login)
+        public async Task<IActionResult> Login([FromBody] LoginDTO login)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var korisnik = await _context.Korisniks
                 .FirstOrDefaultAsync(k => k.Email == login.Username);
@@ -32,100 +37,71 @@ namespace WebAPI.Controllers
             if (korisnik == null)
                 return Unauthorized("Neispravan email ili lozinka.");
 
-            var hashZaProvjeru = PasswordHashProvider.GetHash(login.Password, korisnik.LozinkaSalt!);
+            var hash = PasswordHashProvider.GetHash(login.Password, korisnik.LozinkaSalt!);
 
-            if (korisnik.LozinkaHash != hashZaProvjeru)
+            if (korisnik.LozinkaHash != hash)
                 return Unauthorized("Neispravan email ili lozinka.");
 
             var secureKey = _configuration["JWT:SecureKey"];
-            var token = JwtTokenProvider.CreateToken(secureKey!, 120, korisnik.Email, korisnik.Uloga ?? "Korisnik");
-
-            return Ok(new
-            {
-                Token = token,
+            var token = JwtTokenProvider.CreateToken(
+                secureKey!,
+                120,
                 korisnik.Email,
-                ImePrezime = $"{korisnik.Ime} {korisnik.Prezime}",
-                Uloga = korisnik.Uloga
-            });
+                korisnik.Uloga ?? "Korisnik"
+            );
+
+            // 3. Korištenje AutoMappera umjesto "new AuthResponseDTO { ... }"
+            var response = _mapper.Map<AuthResponseDTO>(korisnik);
+            response.Token = token; // Token postavljamo ručno jer se generira u letu
+
+            return Ok(response);
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register([FromBody] UserRegisterDTO model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             if (await _context.Korisniks.AnyAsync(k => k.Email == model.Email))
-            {
                 return BadRequest("Korisnik s tim emailom već postoji.");
-            }
 
+            // 4. Mapiramo DTO u Model
+            var korisnik = _mapper.Map<Korisnik>(model);
+
+            // Dodajemo stvari koje se ne mapiraju automatski (security i defaults)
             var salt = PasswordHashProvider.GetSalt();
-            var hash = PasswordHashProvider.GetHash(model.Password, salt);
+            korisnik.LozinkaSalt = salt;
+            korisnik.LozinkaHash = PasswordHashProvider.GetHash(model.Password, salt);
+            korisnik.Uloga = "Korisnik";
+            korisnik.Guid = Guid.NewGuid();
 
-            var noviKorisnik = new Korisnik
+            _context.Korisniks.Add(korisnik);
+
+            // 5. Logiranje - možemo i ovdje koristiti mapper ako imamo LogDTO, 
+            // ali za jednostavne poruke ostavljamo ovako ili mapiramo
+            _context.Logovis.Add(new Logovi
             {
-                Ime = model.Ime,
-                Prezime = model.Prezime,
-                Email = model.Email,
-                LozinkaHash = hash,   
-                LozinkaSalt = salt,   
-                Uloga = "Korisnik",
-                Guid = Guid.NewGuid()
-            };
+                Tip = "INFO",
+                Poruka = $"Registriran novi korisnik: {korisnik.Email}",
+                Datum = DateTime.Now
+            });
 
-            try
-            {
-                _context.Korisniks.Add(noviKorisnik);
-
-                _context.Logovis.Add(new Logovi
-                {
-                    Tip = "INFO",
-                    Poruka = $"Novi korisnik registriran s JWT podrškom: {model.Email}",
-                    Datum = DateTime.Now
-                });
-
-                await _context.SaveChangesAsync();
-                return Ok("Registracija uspješna. Sada se možete prijaviti.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Greška pri registraciji: {ex.Message}");
-            }
+            await _context.SaveChangesAsync();
+            return Ok("Registracija uspješna.");
         }
 
         [Authorize]
         [HttpGet("profil")]
-        public IActionResult GetProfile()
+        public async Task<IActionResult> Profil()
         {
+            // 6. Dohvaćanje cijelog profila i mapiranje u DTO/View
             var email = User.Identity?.Name;
-            var uloga = User.FindFirstValue(ClaimTypes.Role);
-            return Ok(new { Poruka = "Pristupili ste zaštićenim podacima", Email = email, Uloga = uloga });
-        }
+            var korisnik = await _context.Korisniks.FirstOrDefaultAsync(k => k.Email == email);
 
-        public class RegisterModel
-        {
-            [Required(ErrorMessage = "Ime je obavezno")]
-            public string Ime { get; set; } = null!;
+            if (korisnik == null) return NotFound();
 
-            [Required(ErrorMessage = "Prezime je obavezno")]
-            public string Prezime { get; set; } = null!;
-
-            [Required(ErrorMessage = "Email je obavezan")]
-            [EmailAddress(ErrorMessage = "Neispravan format emaila")]
-            public string Email { get; set; } = null!;
-
-            [Required(ErrorMessage = "Lozinka je obavezna")]
-            [StringLength(100, MinimumLength = 6, ErrorMessage = "Lozinka mora imati barem 6 znakova")]
-            public string Password { get; set; } = null!;
-        }
-
-        public class LoginModel
-        {
-            [Required(ErrorMessage = "Korisničko ime (Email) je obavezno")]
-            public string Username { get; set; } = null!;
-
-            [Required(ErrorMessage = "Lozinka je obavezna")]
-            public string Password { get; set; } = null!;
+            return Ok(_mapper.Map<KorisnikDTO>(korisnik));
         }
     }
 }
