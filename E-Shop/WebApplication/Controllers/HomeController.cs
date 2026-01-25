@@ -27,16 +27,13 @@ namespace WebApplication.Controllers
                 .Include(p => p.Drzavas)
                 .AsQueryable();
 
-            // Filtriranje po pretrazi
             if (!string.IsNullOrEmpty(searchString))
             {
                 upit = upit.Where(s => s.Naziv.Contains(searchString) || s.Opis.Contains(searchString));
             }
 
-            // Izračun podataka za straničenje
             var ukupnoProizvoda = await upit.CountAsync();
 
-            // Logika za preskakanje (Skip) i uzimanje (Take) određenog broja zapisa
             var proizvodiEntiteti = await upit
                 .Skip((pg - 1) * pageSize)
                 .Take(pageSize)

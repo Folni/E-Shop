@@ -40,7 +40,6 @@
             const searchInput = document.getElementById('searchString').value;
             const url = `@Url.Action("Index", "Home")?pg=${page}&searchString=${encodeURIComponent(searchInput)}`;
 
-            // UI feedback
             document.getElementById('productContainer').style.opacity = '0.5';
 
             fetch(url, {
@@ -54,7 +53,6 @@
                 container.innerHTML = html;
                 container.style.opacity = '1';
 
-                // Skrolaj lagano na vrh ponude nakon promjene stranice
                 window.scrollTo({ top: 150, behavior: 'smooth' });
             })
             .catch(err => {

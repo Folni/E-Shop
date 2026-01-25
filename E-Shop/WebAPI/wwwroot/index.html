@@ -100,7 +100,7 @@
                 $("#navigacija").html('<button onclick="odjaviSe()">Odjavi se</button>');
             } else {
                 $("#navigacija").html('<a href="login.html">Prijavi se</a>');
-                $(".forma-group").hide(); 
+                $(".forma-group").hide();
             }
         }
 
@@ -112,30 +112,31 @@
         function ucitajProizvode() {
             $.get("/api/Proizvodi", function (data) {
                 let html = `<table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Naziv</th>
-                                <th>Opis</th>
-                                <th>Cijena</th>
-                                <th>Kategorija</th>
-                                <th>Akcije</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Naziv</th>
+                                        <th>Opis</th>
+                                        <th>Cijena</th>
+                                        <th>Kategorija</th>
+                                        <th>Akcije</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
 
                 data.forEach(p => {
+                    const jsonP = JSON.stringify(p).replace(/"/g, '&quot;');
                     html += `<tr>
-                            <td>${p.id}</td>
-                            <td><strong>${p.naziv}</strong></td>
-                            <td>${p.opis || '-'}</td>
-                            <td>${p.cijena} EUR</td>
-                            <td>${p.kategorijaNaziv} (ID: ${p.kategorijaId})</td>
-                            <td>
-                                <button class="btn-edit" onclick="pripremiUredivanje(${JSON.stringify(p).replace(/"/g, '&quot;')})">Uredi</button>
-                                <button class="btn-delete" onclick="obrisiProizvod(${p.id})">Obriši</button>
-                            </td>
-                        </tr>`;
+                                    <td>${p.id}</td>
+                                    <td><strong>${p.naziv}</strong></td>
+                                    <td>${p.opis || '-'}</td>
+                                    <td>${p.cijena} EUR</td>
+                                    <td>${p.kategorijaNaziv || 'Nema'} (ID: ${p.kategorijaId})</td>
+                                    <td>
+                                        <button class="btn-edit" onclick="pripremiUredivanje(${jsonP})">Uredi</button>
+                                        <button class="btn-delete" onclick="obrisiProizvod(${p.id})">Obriši</button>
+                                    </td>
+                                </tr>`;
                 });
 
                 html += "</tbody></table>";
@@ -144,8 +145,10 @@
         }
 
         function pripremiUredivanje(p) {
+            const currentId = p.id || p.Id;
+
             $("#forma-naslov").text("Uredi proizvod: " + p.naziv);
-            $("#proizvod-id").val(p.id);
+            $("#proizvod-id").val(currentId);
             $("#naziv").val(p.naziv);
             $("#opis").val(p.opis);
             $("#cijena").val(p.cijena);
@@ -154,6 +157,8 @@
 
             $("#btn-spremi").text("Spremi promjene");
             $("#btn-odustani").show();
+
+            window.scrollTo(0, document.body.scrollHeight);
         }
 
         function resetirajFormu() {
@@ -170,20 +175,29 @@
         }
 
         function spremiProizvod() {
-            const id = $("#proizvod-id").val();
+            const rawId = $("#proizvod-id").val();
+            const idVal = (rawId && rawId.trim() !== "") ? parseInt(rawId) : null;
             const token = localStorage.getItem("JWT_TOKEN");
 
+            const katId = parseInt($("#kategorijaId").val());
+            const cijenaVal = parseFloat($("#cijena").val());
+
+            if (isNaN(katId)) {
+                alert("Greška: Morate unijeti ispravan ID kategorije!");
+                return;
+            }
+
             const proizvodData = {
-                Id: id ? parseInt(id) : 0,
+                Id: idVal || 0,
                 Naziv: $("#naziv").val(),
                 Opis: $("#opis").val(),
-                Cijena: parseFloat($("#cijena").val()),
+                Cijena: isNaN(cijenaVal) ? 0 : cijenaVal,
                 SlikaPath: $("#slikaPath").val(),
-                KategorijaId: parseInt($("#kategorijaId").val())
+                KategorijaId: katId
             };
 
-            const metoda = id ? "PUT" : "POST";
-            const url = id ? "/api/Proizvodi/" + id : "/api/Proizvodi";
+            const metoda = (idVal && idVal > 0) ? "PUT" : "POST";
+            const url = (idVal && idVal > 0) ? "/api/Proizvodi/" + idVal : "/api/Proizvodi";
 
             $.ajax({
                 url: url,
@@ -192,18 +206,23 @@
                 headers: { "Authorization": "Bearer " + token },
                 data: JSON.stringify(proizvodData),
                 success: function () {
-                    alert(id ? "Proizvod ažuriran!" : "Proizvod dodan!");
+                    alert(idVal ? "Proizvod ažuriran!" : "Proizvod dodan!");
                     resetirajFormu();
                     ucitajProizvode();
                 },
                 error: function (err) {
-                    alert("Greška: " + err.responseText);
+                    console.error("Detalji greške:", err);
+                    let poruka = "Nepoznata greška";
+                    if (err.status === 404) poruka = "Proizvod nije pronađen na serveru (404).";
+                    else if (err.responseJSON && err.responseJSON.title) poruka = err.responseJSON.title;
+
+                    alert("Greška kod spremanja: " + poruka);
                 }
             });
         }
 
         function obrisiProizvod(id) {
-            if (!confirm("Sigurno obrisati?")) return;
+            if (!confirm("Sigurno obrisati proizvod ID: " + id + "?")) return;
             const token = localStorage.getItem("JWT_TOKEN");
 
             $.ajax({
@@ -212,6 +231,9 @@
                 headers: { "Authorization": "Bearer " + token },
                 success: function () {
                     ucitajProizvode();
+                },
+                error: function (err) {
+                    alert("Greška kod brisanja. Moguće je da je proizvod povezan s narudžbom.");
                 }
             });
         }

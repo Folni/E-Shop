@@ -42,13 +42,11 @@
 @section Scripts {
     <script>
         document.getElementById('btnSpremi').addEventListener('click', function() {
-            // Priprema podataka
             const podaci = new URLSearchParams();
             podaci.append('ime', document.getElementById('inputIme').value);
             podaci.append('prezime', document.getElementById('inputPrezime').value);
             podaci.append('email', document.getElementById('inputEmail').value);
 
-            // UI Efekti
             const btn = this;
             const loader = document.getElementById('loader');
             const porukaDiv = document.getElementById('statusPoruka');

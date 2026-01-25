@@ -16,13 +16,13 @@ namespace WebAPI.Controllers
     {
         private readonly EtrgovinaContext _context;
         private readonly IConfiguration _configuration;
-        private readonly IMapper _mapper; // 1. Dodajemo mapper
+        private readonly IMapper _mapper; 
 
         public KorisniciController(EtrgovinaContext context, IConfiguration configuration, IMapper mapper)
         {
             _context = context;
             _configuration = configuration;
-            _mapper = mapper; // 2. Ubrizgavamo mapper
+            _mapper = mapper; 
         }
 
         [HttpPost("login")]
@@ -50,9 +50,8 @@ namespace WebAPI.Controllers
                 korisnik.Uloga ?? "Korisnik"
             );
 
-            // 3. Korištenje AutoMappera umjesto "new AuthResponseDTO { ... }"
             var response = _mapper.Map<AuthResponseDTO>(korisnik);
-            response.Token = token; // Token postavljamo ručno jer se generira u letu
+            response.Token = token;
 
             return Ok(response);
         }
@@ -66,10 +65,8 @@ namespace WebAPI.Controllers
             if (await _context.Korisniks.AnyAsync(k => k.Email == model.Email))
                 return BadRequest("Korisnik s tim emailom već postoji.");
 
-            // 4. Mapiramo DTO u Model
             var korisnik = _mapper.Map<Korisnik>(model);
 
-            // Dodajemo stvari koje se ne mapiraju automatski (security i defaults)
             var salt = PasswordHashProvider.GetSalt();
             korisnik.LozinkaSalt = salt;
             korisnik.LozinkaHash = PasswordHashProvider.GetHash(model.Password, salt);
@@ -78,8 +75,6 @@ namespace WebAPI.Controllers
 
             _context.Korisniks.Add(korisnik);
 
-            // 5. Logiranje - možemo i ovdje koristiti mapper ako imamo LogDTO, 
-            // ali za jednostavne poruke ostavljamo ovako ili mapiramo
             _context.Logovis.Add(new Logovi
             {
                 Tip = "INFO",
@@ -95,7 +90,6 @@ namespace WebAPI.Controllers
         [HttpGet("profil")]
         public async Task<IActionResult> Profil()
         {
-            // 6. Dohvaćanje cijelog profila i mapiranje u DTO/View
             var email = User.Identity?.Name;
             var korisnik = await _context.Korisniks.FirstOrDefaultAsync(k => k.Email == email);
 

@@ -3,20 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5C5C911C-DA5F-4818-AA41-B65E6B64514B}|WebAPI\\WebAPI.csproj|c:\\users\\filip\\desktop\\test\\e-shop\\e-shop\\webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{5C5C911C-DA5F-4818-AA41-B65E6B64514B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{D2674F47-611A-4E2F-88FD-FE2D08C6EF43}|WebApplication\\WebApplication.csproj|c:\\users\\filip\\desktop\\test\\e-shop\\e-shop\\webapplication\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D2674F47-611A-4E2F-88FD-FE2D08C6EF43}|WebApplication\\WebApplication.csproj|solutionrelative:webapplication\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D2674F47-611A-4E2F-88FD-FE2D08C6EF43}|WebApplication\\WebApplication.csproj|c:\\users\\filip\\desktop\\test\\e-shop\\e-shop\\webapplication\\mappingprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D2674F47-611A-4E2F-88FD-FE2D08C6EF43}|WebApplication\\WebApplication.csproj|solutionrelative:webapplication\\mappingprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D2674F47-611A-4E2F-88FD-FE2D08C6EF43}|WebApplication\\WebApplication.csproj|c:\\users\\filip\\desktop\\test\\e-shop\\e-shop\\webapplication\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{D2674F47-611A-4E2F-88FD-FE2D08C6EF43}|WebApplication\\WebApplication.csproj|solutionrelative:webapplication\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,53 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebAPI\\appsettings.json",
-              "RelativeDocumentMoniker": "WebAPI\\appsettings.json",
-              "ToolTip": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebAPI\\appsettings.json",
-              "RelativeToolTip": "WebAPI\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-25T17:11:25.624Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebApplication\\Program.cs",
               "RelativeDocumentMoniker": "WebApplication\\Program.cs",
               "ToolTip": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebApplication\\Program.cs",
               "RelativeToolTip": "WebApplication\\Program.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAACsAAAAXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T17:04:20.51Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MappingProfile.cs",
-              "DocumentMoniker": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebApplication\\MappingProfile.cs",
-              "RelativeDocumentMoniker": "WebApplication\\MappingProfile.cs",
-              "ToolTip": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebApplication\\MappingProfile.cs",
-              "RelativeToolTip": "WebApplication\\MappingProfile.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T17:02:19.935Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebApplication\\appsettings.json",
-              "RelativeDocumentMoniker": "WebApplication\\appsettings.json",
-              "ToolTip": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebApplication\\appsettings.json",
-              "RelativeToolTip": "WebApplication\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-25T17:02:11.947Z",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-25T18:02:59.286Z",
               "EditorCaption": ""
             }
           ]

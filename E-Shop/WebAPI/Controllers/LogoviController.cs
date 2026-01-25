@@ -35,7 +35,6 @@ namespace WebAPI.Controllers
                 _ => query.OrderByDescending(l => l.LogId)
             };
 
-            // Koristimo ProjectTo - ovo automatski generira SELECT u SQL-u samo za polja u DTO-u
             var result = await query
                 .Take(n)
                 .ProjectTo<LogDTO>(_mapper.ConfigurationProvider)
@@ -51,10 +50,8 @@ namespace WebAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Mapiramo DTO u Model
             var log = _mapper.Map<Logovi>(dto);
 
-            // Osiguravamo da je datum trenutan ako nije poslan
             log.Datum ??= DateTime.Now;
 
             _context.Logovis.Add(log);
@@ -70,7 +67,6 @@ namespace WebAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Mapiramo cijelu listu odjednom
             var logovi = _mapper.Map<List<Logovi>>(dtos);
 
             foreach (var l in logovi) l.Datum ??= DateTime.Now;
