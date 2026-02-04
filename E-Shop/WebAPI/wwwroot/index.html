@@ -8,76 +8,184 @@
         body {
             font-family: sans-serif;
             padding: 20px;
+            background-color: #f8f9fa;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background: white;
         }
 
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 12px;
             text-align: left;
         }
 
         th {
-            background-color: #f4f4f4;
+            background-color: #007bff;
+            color: white;
         }
 
         nav {
-            padding: 10px;
-            background: #eee;
+            padding: 15px;
+            background: #343a40;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            border-radius: 5px;
         }
 
-        .forma-group {
+            nav a, nav button {
+                color: white;
+                text-decoration: none;
+                margin-left: 10px;
+            }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-logs {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .btn-logout {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
-            padding: 15px;
+        }
+
+        .search-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            width: 250px;
+            padding: 8px;
             border: 1px solid #ccc;
-            background: #f9f9f9;
-            width: 400px;
+            border-radius: 4px;
+        }
+
+        .paging-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn-paging {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+        }
+
+            .btn-paging:disabled {
+                background: #eee;
+                cursor: not-allowed;
+            }
+
+        .forma-group {
+            margin-top: 30px;
+            margin-bottom: 10px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #ffffff;
+            width: 450px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         input, textarea {
             width: 100%;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            padding: 8px;
             box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         .btn-delete {
             background: #dc3545;
             color: white;
             border: none;
-            padding: 5px;
+            padding: 6px 10px;
             cursor: pointer;
+            border-radius: 3px;
         }
 
         .btn-edit {
             background: #ffc107;
             color: black;
             border: none;
-            padding: 5px;
+            padding: 6px 10px;
             cursor: pointer;
+            border-radius: 3px;
             margin-right: 5px;
+        }
+
+        #btn-spremi {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
+
     <nav id="navigacija"></nav>
 
     <h1>Upravljanje proizvodima</h1>
 
-    <div id="proizvodi-kontejner"></div>
+    <div class="controls-row">
+        <div class="search-group">
+            <input type="text" id="inputPretraga" class="search-input" placeholder="Pretraži po nazivu...">
+            <button class="btn-logs" onclick="novaPretraga()">Traži</button>
+            <button class="btn-logout" onclick="ponistiPretragu()">Poništi</button>
+        </div>
+    </div>
+
+    <div id="proizvodi-kontejner">
+        <p>Učitavanje proizvoda...</p>
+    </div>
+
+    <div class="paging-group">
+        <button id="btnPrethodna" class="btn-paging" onclick="promijeniStranicu(-1)">← Prethodna</button>
+        <span id="infoStranica" style="font-weight: bold;">Stranica 1</span>
+        <button id="btnSljedeca" class="btn-paging" onclick="promijeniStranicu(1)">Sljedeća →</button>
+    </div>
 
     <hr>
     <div class="forma-group">
         <h3 id="forma-naslov">Dodaj novi proizvod</h3>
         <input type="hidden" id="proizvod-id">
-
         <input type="text" id="naziv" placeholder="Naziv proizvoda">
         <textarea id="opis" placeholder="Opis proizvoda"></textarea>
         <input type="number" id="cijena" placeholder="Cijena (EUR)">
@@ -85,10 +193,14 @@
         <input type="number" id="kategorijaId" placeholder="ID Kategorije (npr. 1)">
 
         <button id="btn-spremi" onclick="spremiProizvod()">Dodaj proizvod</button>
-        <button id="btn-odustani" onclick="resetirajFormu()" style="display:none;">Odustani</button>
+        <button id="btn-odustani" onclick="resetirajFormu()" style="display:none; margin-top:5px; width:100%;">Odustani</button>
     </div>
 
     <script>
+        let trenutnaStranica = 1;
+        const velicinaStranice = 10;
+        let ukupnoStranica = 1;
+
         $(document).ready(function () {
             provjeriPrijavu();
             ucitajProizvode();
@@ -97,58 +209,110 @@
         function provjeriPrijavu() {
             const token = localStorage.getItem("JWT_TOKEN");
             if (token) {
-                $("#navigacija").html('<button onclick="odjaviSe()">Odjavi se</button>');
+                $("#navigacija").html(`
+                        <div class="nav-links">
+                            <a href="index.html" style="font-weight:bold;">📦 Proizvodi</a>
+                            <button class="btn-logs" onclick="window.location.href='admin_logs.html'">📜 Pregled Logova</button>
+                        </div>
+                        <button class="btn-logout" onclick="odjaviSe()">Odjavi se</button>
+                    `);
             } else {
-                $("#navigacija").html('<a href="login.html">Prijavi se</a>');
+                $("#navigacija").html('<a href="login.html" style="color:white">Prijavi se</a>');
                 $(".forma-group").hide();
             }
         }
 
         function odjaviSe() {
             localStorage.removeItem("JWT_TOKEN");
-            window.location.reload();
+            window.location.href = "login.html";
+        }
+
+        // --- Paging Logika ---
+        function novaPretraga() {
+            trenutnaStranica = 1;
+            ucitajProizvode();
+        }
+
+        function ponistiPretragu() {
+            $("#inputPretraga").val("");
+            novaPretraga();
+        }
+
+        function promijeniStranicu(smjer) {
+            const novaStranica = trenutnaStranica + smjer;
+            if (novaStranica >= 1 && novaStranica <= ukupnoStranica) {
+                trenutnaStranica = novaStranica;
+                ucitajProizvode();
+            }
         }
 
         function ucitajProizvode() {
-            $.get("/api/Proizvodi", function (data) {
-                let html = `<table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Naziv</th>
-                                        <th>Opis</th>
-                                        <th>Cijena</th>
-                                        <th>Kategorija</th>
-                                        <th>Akcije</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
+            const token = localStorage.getItem("JWT_TOKEN");
+            const naziv = $("#inputPretraga").val();
 
-                data.forEach(p => {
-                    const jsonP = JSON.stringify(p).replace(/"/g, '&quot;');
-                    html += `<tr>
-                                    <td>${p.id}</td>
-                                    <td><strong>${p.naziv}</strong></td>
-                                    <td>${p.opis || '-'}</td>
-                                    <td>${p.cijena} EUR</td>
-                                    <td>${p.kategorijaNaziv || 'Nema'} (ID: ${p.kategorijaId})</td>
-                                    <td>
-                                        <button class="btn-edit" onclick="pripremiUredivanje(${jsonP})">Uredi</button>
-                                        <button class="btn-delete" onclick="obrisiProizvod(${p.id})">Obriši</button>
-                                    </td>
-                                </tr>`;
-                });
-
-                html += "</tbody></table>";
-                $("#proizvodi-kontejner").html(html);
+            $.ajax({
+                url: `/api/Proizvodi/Paged?page=${trenutnaStranica}&pageSize=${velicinaStranice}&naziv=${naziv}`,
+                method: "GET",
+                headers: { "Authorization": "Bearer " + token },
+                success: function (data) {
+                    ukupnoStranica = data.totalPages;
+                    osvjeziPagingKontrole(data);
+                    renderTablicu(data.items);
+                },
+                error: function () {
+                    $("#proizvodi-kontejner").html("<p style='color:red;'>Greška pri učitavanju ili niste prijavljeni.</p>");
+                }
             });
         }
 
-        function pripremiUredivanje(p) {
-            const currentId = p.id || p.Id;
+        function osvjeziPagingKontrole(data) {
+            $("#infoStranica").text(`Stranica ${data.currentPage} od ${data.totalPages || 1}`);
+            $("#btnPrethodna").prop("disabled", data.currentPage <= 1);
+            $("#btnSljedeca").prop("disabled", data.currentPage >= data.totalPages || data.totalPages === 0);
+        }
 
+        function renderTablicu(items) {
+            if (!items || items.length === 0) {
+                $("#proizvodi-kontejner").html("<p>Nema pronađenih proizvoda.</p>");
+                return;
+            }
+
+            let html = `<table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Naziv</th>
+                            <th>Opis</th>
+                            <th>Cijena</th>
+                            <th>Kategorija</th>
+                            <th>Akcije</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            items.forEach(p => {
+                const jsonP = JSON.stringify(p).replace(/"/g, '&quot;');
+                html += `<tr>
+                        <td>${p.id}</td>
+                        <td><strong>${p.naziv}</strong></td>
+                        <td>${p.opis || '-'}</td>
+                        <td>${p.cijena} EUR</td>
+                        <td>${p.kategorijaNaziv || 'Nema'} (ID: ${p.kategorijaId})</td>
+                        <td>
+                            <button class="btn-edit" onclick="pripremiUredivanje(${jsonP})">Uredi</button>
+                            <button class="btn-delete" onclick="obrisiProizvod(${p.id})">Obriši</button>
+                        </td>
+                    </tr>`;
+            });
+
+            html += "</tbody></table>";
+            $("#proizvodi-kontejner").html(html);
+        }
+
+        // --- CRUD Funkcije ---
+        function pripremiUredivanje(p) {
             $("#forma-naslov").text("Uredi proizvod: " + p.naziv);
-            $("#proizvod-id").val(currentId);
+            $("#proizvod-id").val(p.id);
             $("#naziv").val(p.naziv);
             $("#opis").val(p.opis);
             $("#cijena").val(p.cijena);
@@ -157,7 +321,6 @@
 
             $("#btn-spremi").text("Spremi promjene");
             $("#btn-odustani").show();
-
             window.scrollTo(0, document.body.scrollHeight);
         }
 
@@ -169,35 +332,28 @@
             $("#cijena").val("");
             $("#slikaPath").val("");
             $("#kategorijaId").val("");
-
             $("#btn-spremi").text("Dodaj proizvod");
             $("#btn-odustani").hide();
         }
 
         function spremiProizvod() {
-            const rawId = $("#proizvod-id").val();
-            const idVal = (rawId && rawId.trim() !== "") ? parseInt(rawId) : null;
+            const idVal = parseInt($("#proizvod-id").val());
             const token = localStorage.getItem("JWT_TOKEN");
-
             const katId = parseInt($("#kategorijaId").val());
-            const cijenaVal = parseFloat($("#cijena").val());
 
-            if (isNaN(katId)) {
-                alert("Greška: Morate unijeti ispravan ID kategorije!");
-                return;
-            }
+            if (isNaN(katId)) { alert("ID kategorije mora biti broj!"); return; }
 
             const proizvodData = {
                 Id: idVal || 0,
                 Naziv: $("#naziv").val(),
                 Opis: $("#opis").val(),
-                Cijena: isNaN(cijenaVal) ? 0 : cijenaVal,
+                Cijena: parseFloat($("#cijena").val()) || 0,
                 SlikaPath: $("#slikaPath").val(),
                 KategorijaId: katId
             };
 
-            const metoda = (idVal && idVal > 0) ? "PUT" : "POST";
-            const url = (idVal && idVal > 0) ? "/api/Proizvodi/" + idVal : "/api/Proizvodi";
+            const metoda = (idVal > 0) ? "PUT" : "POST";
+            const url = (idVal > 0) ? "/api/Proizvodi/" + idVal : "/api/Proizvodi";
 
             $.ajax({
                 url: url,
@@ -206,18 +362,11 @@
                 headers: { "Authorization": "Bearer " + token },
                 data: JSON.stringify(proizvodData),
                 success: function () {
-                    alert(idVal ? "Proizvod ažuriran!" : "Proizvod dodan!");
+                    alert("Uspješno spremljeno!");
                     resetirajFormu();
                     ucitajProizvode();
                 },
-                error: function (err) {
-                    console.error("Detalji greške:", err);
-                    let poruka = "Nepoznata greška";
-                    if (err.status === 404) poruka = "Proizvod nije pronađen na serveru (404).";
-                    else if (err.responseJSON && err.responseJSON.title) poruka = err.responseJSON.title;
-
-                    alert("Greška kod spremanja: " + poruka);
-                }
+                error: function (err) { alert("Greška: Provjerite jeste li Admin i jesu li podaci ispravni."); }
             });
         }
 
@@ -229,12 +378,8 @@
                 url: "/api/Proizvodi/" + id,
                 method: "DELETE",
                 headers: { "Authorization": "Bearer " + token },
-                success: function () {
-                    ucitajProizvode();
-                },
-                error: function (err) {
-                    alert("Greška kod brisanja. Moguće je da je proizvod povezan s narudžbom.");
-                }
+                success: function () { ucitajProizvode(); },
+                error: function () { alert("Greška kod brisanja."); }
             });
         }
     </script>

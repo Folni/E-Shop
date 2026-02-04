@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>eTrgovina - Registracija</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        .register-box {
+            width: 350px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        #poruka {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .back-to-login {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #666;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-box">
+        <h2>Registracija</h2>
+        <input type="text" id="imeInput" placeholder="Ime">
+        <input type="text" id="prezimeInput" placeholder="Prezime">
+        <input type="email" id="emailInput" placeholder="Email (bit će korisničko ime)">
+        <input type="password" id="passwordInput" placeholder="Lozinka">
+        <button onclick="registrirajSe()">Stvori račun</button>
+        <p id="poruka"></p>
+        <a href="login.html" class="back-to-login">Već imate račun? Prijavite se</a>
+    </div>
+
+    <script>function registrirajSe() {
+            const regData = {
+                Ime: $("#imeInput").val(),
+                Prezime: $("#prezimeInput").val(),
+                Email: $("#emailInput").val(),
+                Password: $("#passwordInput").val()
+            };
+
+            if (!regData.Email || !regData.Password) {
+                $("#poruka").css("color", "red").text("Email i lozinka su obavezni.");
+                return;
+            }
+
+            $("#poruka").css("color", "blue").text("Slanje podataka...");
+
+            $.ajax({
+                url: "/api/Korisnici/register",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(regData),
+                success: function (odgovor) {
+                    $("#poruka").css("color", "green").text("Uspjeh! Preusmjeravanje na prijavu...");
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 2000);
+                },
+                error: function (err) {
+                    let msg = "Greška pri registraciji.";
+                    if (err.status === 400) msg = err.responseText || "Provjerite unesene podatke.";
+                    $("#poruka").css("color", "red").text(msg);
+                }
+            });
+        }</script>
+</body>
+</html>

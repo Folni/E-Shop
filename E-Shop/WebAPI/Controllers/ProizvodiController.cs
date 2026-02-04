@@ -21,7 +21,41 @@ namespace WebAPI.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Proizvodi
+        // GET: api/Proizvodi/Paged?page=1&pageSize=10&naziv=mobitel
+        [HttpGet("Paged")]
+        public async Task<IActionResult> GetPagedProizvodi(int page = 1, int pageSize = 10, string? naziv = null)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            var query = _context.Proizvods.AsQueryable();
+
+            if (!string.IsNullOrEmpty(naziv))
+            {
+                query = query.Where(p => p.Naziv.Contains(naziv));
+            }
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            var stavke = await query
+                .OrderBy(p => p.ProizvodId) 
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ProjectTo<ProizvodDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize,
+                Items = stavke
+            });
+        }
+
+        // GET: api/Proizvodi 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProizvodDTO>>> GetProizvodi()
         {
@@ -43,7 +77,6 @@ namespace WebAPI.Controllers
             try
             {
                 var proizvod = _mapper.Map<Proizvod>(dto);
-
                 proizvod.Kategorija = null;
 
                 _context.Proizvods.Add(proizvod);
@@ -85,9 +118,7 @@ namespace WebAPI.Controllers
             try
             {
                 _mapper.Map(dto, proizvod);
-
                 proizvod.Kategorija = null;
-
                 proizvod.ProizvodId = id;
 
                 _context.Logovis.Add(new Logovi

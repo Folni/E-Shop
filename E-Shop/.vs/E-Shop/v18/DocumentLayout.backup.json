@@ -1,10 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\",
+  "WorkspaceRootPath": "C:\\Users\\filip\\Desktop\\Faks_God3\\Folnegovi\u0107-Filip-EShop\\E-Shop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D2674F47-611A-4E2F-88FD-FE2D08C6EF43}|WebApplication\\WebApplication.csproj|c:\\users\\filip\\desktop\\test\\e-shop\\e-shop\\webapplication\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D2674F47-611A-4E2F-88FD-FE2D08C6EF43}|WebApplication\\WebApplication.csproj|solutionrelative:webapplication\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5C5C911C-DA5F-4818-AA41-B65E6B64514B}|WebAPI\\WebAPI.csproj|c:\\users\\filip\\desktop\\faks_god3\\folnegovi\u0107-filip-eshop\\e-shop\\webapi\\wwwroot\\login.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C5C911C-DA5F-4818-AA41-B65E6B64514B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\wwwroot\\login.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C5C911C-DA5F-4818-AA41-B65E6B64514B}|WebAPI\\WebAPI.csproj|c:\\users\\filip\\desktop\\faks_god3\\folnegovi\u0107-filip-eshop\\e-shop\\webapi\\wwwroot\\register.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C5C911C-DA5F-4818-AA41-B65E6B64514B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\wwwroot\\register.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C5C911C-DA5F-4818-AA41-B65E6B64514B}|WebAPI\\WebAPI.csproj|c:\\users\\filip\\desktop\\faks_god3\\folnegovi\u0107-filip-eshop\\e-shop\\webapi\\controllers\\korisnicicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C5C911C-DA5F-4818-AA41-B65E6B64514B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\controllers\\korisnicicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,19 +22,45 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "register.html",
+              "DocumentMoniker": "C:\\Users\\filip\\Desktop\\Faks_God3\\Folnegovi\u0107-Filip-EShop\\E-Shop\\WebAPI\\wwwroot\\register.html",
+              "RelativeDocumentMoniker": "WebAPI\\wwwroot\\register.html",
+              "ToolTip": "C:\\Users\\filip\\Desktop\\Faks_God3\\Folnegovi\u0107-Filip-EShop\\E-Shop\\WebAPI\\wwwroot\\register.html",
+              "RelativeToolTip": "WebAPI\\wwwroot\\register.html",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAwwGgAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-02-04T18:51:13.13Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebApplication\\Program.cs",
-              "RelativeDocumentMoniker": "WebApplication\\Program.cs",
-              "ToolTip": "C:\\Users\\filip\\Desktop\\Test\\E-Shop\\E-Shop\\WebApplication\\Program.cs",
-              "RelativeToolTip": "WebApplication\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "login.html",
+              "DocumentMoniker": "C:\\Users\\filip\\Desktop\\Faks_God3\\Folnegovi\u0107-Filip-EShop\\E-Shop\\WebAPI\\wwwroot\\login.html",
+              "RelativeDocumentMoniker": "WebAPI\\wwwroot\\login.html",
+              "ToolTip": "C:\\Users\\filip\\Desktop\\Faks_God3\\Folnegovi\u0107-Filip-EShop\\E-Shop\\WebAPI\\wwwroot\\login.html",
+              "RelativeToolTip": "WebAPI\\wwwroot\\login.html",
+              "ViewState": "AgIAADwAAAAAAAAAAAAAAF4AAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-02-04T18:49:34.653Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "KorisniciController.cs",
+              "DocumentMoniker": "C:\\Users\\filip\\Desktop\\Faks_God3\\Folnegovi\u0107-Filip-EShop\\E-Shop\\WebAPI\\Controllers\\KorisniciController.cs",
+              "RelativeDocumentMoniker": "WebAPI\\Controllers\\KorisniciController.cs",
+              "ToolTip": "C:\\Users\\filip\\Desktop\\Faks_God3\\Folnegovi\u0107-Filip-EShop\\E-Shop\\WebAPI\\Controllers\\KorisniciController.cs",
+              "RelativeToolTip": "WebAPI\\Controllers\\KorisniciController.cs",
+              "ViewState": "AgIAAEwAAAAAAAAAAAAUwE8AAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T18:02:59.286Z",
+              "WhenOpened": "2026-02-04T17:31:50.365Z",
               "EditorCaption": ""
             }
           ]

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions; // Potrebno za ProjectTo
+using AutoMapper.QueryableExtensions;
 using ETrgovina.DAL.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin")] 
     public class LogoviController : ControllerBase
     {
         private readonly EtrgovinaContext _context;
@@ -22,10 +22,13 @@ namespace WebAPI.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Logovi?n=10&orderBy=id
+        // GET: api/Logovi?page=1&pageSize=10&orderBy=datum
         [HttpGet]
-        public async Task<IActionResult> Get(int n = 10, string orderBy = "id")
+        public async Task<IActionResult> Get(int page = 1, int pageSize = 10, string orderBy = "id")
         {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
             var query = _context.Logovis.AsQueryable();
 
             query = orderBy.ToLower() switch
@@ -35,12 +38,23 @@ namespace WebAPI.Controllers
                 _ => query.OrderByDescending(l => l.LogId)
             };
 
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
             var result = await query
-                .Take(n)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ProjectTo<LogDTO>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return Ok(result);
+            return Ok(new
+            {
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize,
+                Items = result
+            });
         }
 
         // POST: api/Logovi
@@ -51,7 +65,6 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
 
             var log = _mapper.Map<Logovi>(dto);
-
             log.Datum ??= DateTime.Now;
 
             _context.Logovis.Add(log);
@@ -68,7 +81,6 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
 
             var logovi = _mapper.Map<List<Logovi>>(dtos);
-
             foreach (var l in logovi) l.Datum ??= DateTime.Now;
 
             _context.Logovis.AddRange(logovi);

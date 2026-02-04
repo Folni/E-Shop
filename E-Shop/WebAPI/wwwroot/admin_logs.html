@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Pregled Logova</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .status-badge {
+            width: 80px;
+            text-align: center;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <div>
+                <span class="navbar-brand mb-0 h1">E-Trgovina Admin Panel</span>
+                <a href="index.html" class="btn btn-outline-info btn-sm ms-3">Proizvodi</a>
+            </div>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()">Odjava</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="m-0">Sistemski zapisi</h3>
+                        <div class="d-flex gap-2">
+                            <select id="countSelect" class="form-select form-select-sm" style="width: 130px;" onchange="novaPretraga()">
+                                <option value="10">10 po str.</option>
+                                <option value="20" selected>20 po str.</option>
+                                <option value="50">50 po str.</option>
+                                <option value="100">100 po str.</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" onclick="ucitajLogove()">
+                                <i class="bi bi-arrow-clockwise"></i> Osvježi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-responsive p-3">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Datum</th>
+                            <th>Tip</th>
+                            <th>Poruka</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-container border-top">
+                <button id="btnPrethodna" class="btn btn-outline-secondary btn-sm" onclick="promijeniStranicu(-1)">
+                    <i class="bi bi-chevron-left"></i> Prethodna
+                </button>
+                <span id="infoStranica" class="fw-bold text-muted">Stranica 1 od 1</span>
+                <button id="btnSljedeca" class="btn btn-outline-secondary btn-sm" onclick="promijeniStranicu(1)">
+                    Sljedeća <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        const token = localStorage.getItem("JWT_TOKEN");
+        if (!token) {
+            window.location.href = "login.html";
+        }
+
+        let trenutnaStranica = 1;
+        let ukupnoStranica = 1;
+
+        $(document).ready(function () {
+            ucitajLogove();
+        });
+
+        function novaPretraga() {
+            trenutnaStranica = 1;
+            ucitajLogove();
+        }
+
+        function promijeniStranicu(smjer) {
+            const nova = trenutnaStranica + smjer;
+            if (nova >= 1 && nova <= ukupnoStranica) {
+                trenutnaStranica = nova;
+                ucitajLogove();
+            }
+        }
+
+        function ucitajLogove() {
+            const pageSize = $("#countSelect").val();
+
+            $.ajax({
+                url: `/api/Logovi?page=${trenutnaStranica}&pageSize=${pageSize}&orderBy=datum`,
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                success: function (data) {
+                    ukupnoStranica = data.totalPages;
+
+                    renderLogs(data.items);
+                    osvjeziUI(data);
+                },
+                error: function (err) {
+                    if (err.status === 401) {
+                        alert("Sesija istekla ili nemate ovlasti.");
+                        logout();
+                    } else {
+                        console.error("Greška pri dohvatu logova:", err);
+                    }
+                }
+            });
+        }
+
+        function osvjeziUI(data) {
+            $("#infoStranica").text(`Stranica ${data.currentPage} od ${data.totalPages || 1}`);
+
+            $("#btnPrethodna").prop("disabled", data.currentPage <= 1);
+            $("#btnSljedeca").prop("disabled", data.currentPage >= data.totalPages || data.totalPages === 0);
+        }
+
+        function renderLogs(logs) {
+            const tbody = $("#logsTableBody");
+            tbody.empty();
+
+            if (!logs || logs.length === 0) {
+                tbody.append('<tr><td colspan="4" class="text-center text-muted">Nema zapisa za prikaz.</td></tr>');
+                return;
+            }
+
+            logs.forEach(log => {
+                const prikazniId = log.id || log.logId || 0;
+                const rawDatum = log.datum;
+                const date = rawDatum ? new Date(rawDatum).toLocaleString('hr-HR') : '-';
+
+                const tip = (log.tip || 'INFO').toUpperCase();
+                let tipClass = "bg-info text-white";
+                if (tip === "ERROR") tipClass = "bg-danger";
+                if (tip === "UPDATE") tipClass = "bg-warning text-dark";
+                if (tip === "DELETE") tipClass = "bg-dark text-white";
+
+                const poruka = log.poruka || '';
+
+                tbody.append(`
+                    <tr>
+                        <td><small class="text-muted">${prikazniId}</small></td>
+                        <td>${date}</td>
+                        <td><span class="badge ${tipClass} status-badge">${tip}</span></td>
+                        <td>${poruka}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem("JWT_TOKEN");
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>

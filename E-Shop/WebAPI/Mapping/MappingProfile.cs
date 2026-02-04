@@ -49,6 +49,9 @@ public class MappingProfile : Profile
         CreateMap<StavkaDTO, NarudzbaProizvod>();
 
         // --- LOG ---
-        CreateMap<Logovi, LogDTO>().ReverseMap();
+        CreateMap<Logovi, LogDTO>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.LogId)) //LogId (baza) -> Id (DTO)
+            .ReverseMap()
+            .ForMember(dest => dest.LogId, opt => opt.MapFrom(src => src.Id)); //Id (DTO) -> LogId (baza)
     }
 }

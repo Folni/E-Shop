@@ -1,0 +1,14 @@
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\bin\Debug\net8.0\DAL.deps.json
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\bin\Debug\net8.0\DAL.runtimeconfig.json
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\bin\Debug\net8.0\DAL.dll
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\bin\Debug\net8.0\DAL.pdb
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\DAL.csproj.AssemblyReference.cache
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\DAL.AssemblyInfoInputs.cache
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\DAL.AssemblyInfo.cs
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\DAL.csproj.CoreCompileInputs.cache
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\DAL.dll
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\refint\DAL.dll
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\DAL.pdb
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\DAL.genruntimeconfig.cache
+C:\Users\filip\Desktop\Faks_God3\Folnegović-Filip-EShop\E-Shop\DAL\obj\Debug\net8.0\ref\DAL.dll
